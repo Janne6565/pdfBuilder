@@ -11,7 +11,9 @@ import NumberInputComponent from "../../components/inputs/NumberInputComponent.t
 export type BuilderFormData = {
     name?: string,
     age?: number,
-    favoriteColor?: string
+    favoriteColor?: string,
+    age2?: number;
+    name2?: string;
 }
 
 const defaultData: BuilderFormData = {}
@@ -20,8 +22,6 @@ export const DataContext = createContext<[BuilderFormData, React.Dispatch<React.
 
 function MainContentPage() {
     const [currentState, setCurrentState] = useState<BuilderFormData>(defaultData);
-    useEffect(() => {
-    }, []);
 
     const buildPdf = (data: BuilderFormData) => {
         console.log("Building pdf with data: ", data);
@@ -34,9 +34,11 @@ function MainContentPage() {
                 <Box className={styles.document}>
                     <DocumentHeader/>
 
-                    <StringInputComponent label={"Name"} placeholder={"Toni"} id={"name"}/><br/><br/>
+                    <StringInputComponent label={"Name"} placeholder={"Name"} id={"name"}/><br/><br/>
                     <NumberInputComponent label={"Age"} id={"age"}/><br/><br/>
                     <StringSelectionComponent label={"Favorite color"} options={["Green", "Blue", "Red", "Yellow"]} id={"favoriteColor"}/><br/><br/>
+                    <NumberInputComponent label={"Age2"} id={"age2"}/><br/><br/>
+                    <StringInputComponent label={"Name 2"} placeholder={"Name"} id={"name2"}/> 
                 </Box>
                 <PDFDownloadLink document={<PdfDocument {...currentState}/>} fileName="somename.pdf">
                     {({ blob, url, loading, error }) => (loading ? 'Loading document...' : 'Download now!')}
