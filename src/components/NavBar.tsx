@@ -2,7 +2,7 @@ import { AppBar, SvgIcon, Toolbar, Typography } from "@mui/material";
 
 function NavBar() {
   return (
-    <AppBar color={"primary"} component="nav">
+    <AppBar color={"info"} component="nav">
       <Toolbar>
         <SvgIcon>
           <svg

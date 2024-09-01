@@ -1,28 +1,78 @@
-import {BuilderFormData, DataContext} from "../../pages/mainPage/MainContentPage.tsx";
-import React, {useContext} from "react";
-import {FormControl, InputLabel, MenuItem, Select} from "@mui/material";
+import {
+  BuilderFormData,
+  DataContext,
+  ValidContext,
+} from "../../pages/mainPage/MainContentPage.tsx";
+import React, { useCallback, useContext, useEffect } from "react";
+import {
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+} from "@mui/material";
 
 interface StringSelectionComponentProps {
-    label: string,
-    options: string[],
-    id: keyof BuilderFormData,
-    header?: string,
-    defaultValue?: string
+  label: string;
+  options: string[];
+  id: keyof BuilderFormData;
+  header?: string;
+  defaultValue?: string;
+  validCheck?: (data: BuilderFormData) => boolean;
+  renderCondition?: (data: BuilderFormData) => boolean;
 }
 
 function StringSelectionComponent(props: StringSelectionComponentProps) {
-    const [data, setData] = useContext(DataContext);
+  const [data, setData] = useContext(DataContext);
+  const [validity, setValidity] = useContext(ValidContext);
 
-    const setValue = (value: string) => {
-        setData(prevVal => ({...prevVal, [props.id]: value}));
-    }
+  const setValue = useCallback(
+    (value: string) => {
+      setData((prevData) => ({ ...prevData, [props.id]: value }));
+    },
+    [setData]
+  );
 
-    return <FormControl sx={{width: "200px"}}>
-        <InputLabel>{props.label}</InputLabel>
-        <Select labelId={"input-label-" + props.id} label={props.label} onChange={(e) => setValue(e.target.value as string)}>
-            {props.options.map(option => <MenuItem value={option}>{option}</MenuItem>)}
-        </Select>
-    </FormControl>;
+  useEffect(() => {
+    const valid = props.validCheck ? props.validCheck(data) : true;
+    setValidity((prevVal) => ({ ...prevVal, [props.id]: valid }));
+  }, [data]);
+
+  useEffect(() => {
+    setValue(props.defaultValue || "");
+  }, [props.defaultValue]);
+
+  const onChange = useCallback(
+    (e: SelectChangeEvent) => {
+      setValue(e.target.value);
+    },
+    [props.validCheck, props.id, data, validity]
+  );
+
+  return (
+    <>
+      {props.renderCondition == undefined || props.renderCondition(data) ? (
+        <FormControl sx={{ width: "200px" }}>
+          <InputLabel error={!validity[props.id]}>{props.label}</InputLabel>
+          <Select
+            labelId={"input-label-" + props.id}
+            label={props.label}
+            onChange={onChange}
+            error={!validity[props.id]}
+            value={data[props.id] as string}
+          >
+            {props.options.map((option) => (
+              <MenuItem key={option} value={option}>
+                {option}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      ) : (
+        <></>
+      )}
+    </>
+  );
 }
 
 export default StringSelectionComponent;
