@@ -9,3 +9,11 @@
     flex: 0 0 auto;
   }
 }
+
+.inputs {
+  display: flex;
+  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 20px;
+  width: 50%;
+}

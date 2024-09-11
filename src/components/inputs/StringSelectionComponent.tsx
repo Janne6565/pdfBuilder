@@ -59,7 +59,7 @@ function StringSelectionComponent(props: StringSelectionComponentProps) {
             label={props.label}
             onChange={onChange}
             error={!validity[props.id]}
-            value={data[props.id] as string}
+            value={data[props.id] as string ?? " "}
           >
             {props.options.map((option) => (
               <MenuItem key={option} value={option}>

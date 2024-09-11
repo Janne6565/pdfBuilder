@@ -1,12 +1,73 @@
-import { Box, Button, Toolbar } from "@mui/material";
+import { Box, Button, ButtonGroup, Toolbar } from "@mui/material";
 import React, { createContext, useEffect, useState } from "react";
 import StringInputComponent from "../../components/inputs/StringInputComponent.tsx";
 import DocumentHeader from "../../components/DocumentHeader.tsx";
 import styles from "./style.module.scss";
 import StringSelectionComponent from "../../components/inputs/StringSelectionComponent.tsx";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import {
+  BlobProvider,
+  PDFDownloadLink,
+  PDFViewer,
+  usePDF,
+} from "@react-pdf/renderer";
 import PdfDocument from "../../pdfExport/PdfDocument.tsx";
 import NumberInputComponent from "../../components/inputs/NumberInputComponent.tsx";
+
+const pages: PageObjects = [
+  {
+    heading: "Page 1",
+    items: [
+      {
+        render: (props) => (
+          <StringInputComponent
+            label={"Name"}
+            placeholder={"Name"}
+            id={"name"}
+          />
+        ),
+      },
+      {
+        render: (props) => (
+          <NumberInputComponent label={"Age"} id={"age"} defaultValue={18} />
+        ),
+      },
+      {
+        render: (props) => (
+          <StringSelectionComponent
+            label={"Favorite color"}
+            id={"favoriteColor"}
+            defaultValue={"red"}
+            options={["red", "blue", "green"]}
+          />
+        ),
+      },
+    ],
+  },
+  {
+    heading: "Page 2",
+    items: [
+      {
+        render: (data) => (
+          <StringInputComponent
+            id="test"
+            label={"Second name"}
+            placeholder={"Second name"}
+          />
+        ),
+      },
+      {
+        render: (data) => (
+          <StringInputComponent
+            id="reason"
+            label="Underaged check"
+            placeholder="Reasoning bla bla"
+            renderCondition={(props) => props.age! < 18}
+          />
+        ),
+      },
+    ],
+  },
+];
 
 export type BuilderFormData = {
   name?: string;
@@ -14,7 +75,17 @@ export type BuilderFormData = {
   favoriteColor?: string;
   age2?: number;
   name2?: string;
+  age3?: number;
+  test?: string;
+  reason?: string;
 };
+
+export type PageObjects = {
+  heading: string;
+  items: {
+    render: (data: BuilderFormData) => React.ReactNode;
+  }[];
+}[];
 
 export type ValidityContextData = Record<keyof BuilderFormData, boolean>;
 
@@ -30,6 +101,7 @@ const defaultValidity: ValidityContextData = Object.keys(defaultData).reduce(
 export const DataContext = createContext<
   [BuilderFormData, React.Dispatch<React.SetStateAction<BuilderFormData>>]
 >([defaultData, () => {}]);
+
 export const ValidContext = createContext<
   [
     ValidityContextData,
@@ -42,10 +114,7 @@ function MainContentPage() {
     useState<BuilderFormData>(defaultData);
   const [currentValidity, setCurrentValidity] =
     useState<ValidityContextData>(defaultValidity);
-
-  const buildPdf = (data: BuilderFormData) => {
-    console.log("Building pdf with data: ", data);
-  };
+  const [currentPage, setCurrentPage] = useState(0);
 
   return (
     <DataContext.Provider value={[currentState, setCurrentState]}>
@@ -53,53 +122,54 @@ function MainContentPage() {
         <Box component="main" sx={{ textAlign: "center", width: "100%" }}>
           <Toolbar />
           <Box className={styles.document}>
-            <DocumentHeader />
-            <StringInputComponent
-              label={"Name"}
-              placeholder={"Name"}
-              id={"name"}
-              validCheck={(props) => props.name != "janne"}
-            />
-            <br />
-            <br />
-            <NumberInputComponent
-              label={"Age"}
-              id={"age"}
-              validCheck={(props) => props.age2! < props.age!}
-              defaultValue={10}
-            />
-            <br />
-            <br />
-            <StringSelectionComponent
-              label={"Favorite color"}
-              options={["Green", "Blue", "Red", "Yellow"]}
-              id={"favoriteColor"}
-              validCheck={(data) => data.favoriteColor != "Red"}
-            />
-            <br />
-            <br />
-
-            <NumberInputComponent label={"Age2"} id={"age2"} />
-            <br />
-            <br />
-						
-            <StringInputComponent
-              label={"Name 2"}
-              placeholder={"Name"}
-              id={"name2"}
-              defaultValue="Test name"
-							renderCondition={(data) => data.name == "janne"}
-            />
-
+            <DocumentHeader header={pages[currentPage].heading} />
+            <div className={styles.inputs}>
+              {pages[currentPage].items.map((item) =>
+                item.render(currentState)
+              )}
+            </div>
           </Box>
-          <PDFDownloadLink
-            document={<PdfDocument {...currentState} />}
-            fileName="export.pdf"
-          >
-            {({ blob, url, loading, error }) =>
-              loading ? "Loading document..." : "Download now!"
-            }
-          </PDFDownloadLink>
+
+          <BlobProvider document={<PdfDocument {...currentState} />}>
+            {({ blob, url, loading, error }) => (
+              <ButtonGroup>
+                <Button
+                  onClick={() => {
+                    setCurrentPage((currentPage) => currentPage - 1);
+                  }}
+                  value={"Back"}
+                  disabled={currentPage <= 0}
+                >
+                  Back
+                </Button>
+                <Button
+                  onClick={() => {
+                    if (currentPage < pages.length - 1) {
+                      setCurrentPage((currentPage) => currentPage + 1);
+                    } else {
+                      const blob_url = window.URL.createObjectURL(blob!);
+                      const link = document.createElement("a");
+                      link.href = blob_url ?? "";
+                      link.setAttribute("download", "export.pdf");
+                      document.body.appendChild(link);
+                      link.click();
+                      link.parentNode?.removeChild(link);
+                    }
+                  }}
+                  disabled={currentPage < pages.length - 1 ? false : loading}
+                  variant={
+                    currentPage < pages.length - 1 ? "outlined" : "contained"
+                  }
+                >
+                  {currentPage < pages.length - 1
+                    ? "Next"
+                    : loading
+                    ? "Loading..."
+                    : "Download"}
+                </Button>
+              </ButtonGroup>
+            )}
+          </BlobProvider>
         </Box>
       </ValidContext.Provider>
     </DataContext.Provider>

@@ -24,7 +24,7 @@ function StringInputComponent(props: StringInputComponentProps) {
     (value: string) => {
       setData((prevData) => ({ ...prevData, [props.id]: value }));
     },
-    [setData]
+    [setData, props.id]
   );
 
   useEffect(() => {
@@ -33,11 +33,12 @@ function StringInputComponent(props: StringInputComponentProps) {
   }, [data]);
 
   useEffect(() => {
-    setValue(props.defaultValue || "");
-  }, [props.defaultValue]);
+    setValue(data[props.id] as string ?? (props.defaultValue || ""));
+  }, [props.defaultValue, data]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+      console.log(props.id, "changed")
       setValue(e.target.value);
     },
     [props.validCheck, props.id, data, validity]

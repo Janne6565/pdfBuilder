@@ -31,8 +31,8 @@ function NumberInputComponent(props: NumberInputComponentProps) {
   }, [data]);
 
   useEffect(() => {
-    setValue(props.defaultValue || 0);
-  }, [props.defaultValue]);
+    setValue(data[props.id] as number ?? (props.defaultValue || 0));
+  }, [props.defaultValue, data]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {

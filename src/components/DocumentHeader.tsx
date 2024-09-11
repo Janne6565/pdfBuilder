@@ -1,8 +1,13 @@
-function DocumentHeader() {
+interface DocumentHeaderProps {
+  header: string;
+}
+
+
+function DocumentHeader(props: DocumentHeaderProps) {
   return (
     <header>
       <h1>Berechnungs Tool</h1>
-      <h2>Automatisches erstellen von Rechnungsblättern für ...</h2>
+      <h2>{props.header}</h2>
       <br />
     </header>
   );
