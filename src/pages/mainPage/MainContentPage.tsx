@@ -1,17 +1,20 @@
-import { Box, Button, ButtonGroup, Toolbar } from "@mui/material";
-import React, { createContext, useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Toolbar,
+} from "@mui/material";
+import React, { createContext, useState } from "react";
 import StringInputComponent from "../../components/inputs/StringInputComponent.tsx";
 import DocumentHeader from "../../components/DocumentHeader.tsx";
 import styles from "./style.module.scss";
 import StringSelectionComponent from "../../components/inputs/StringSelectionComponent.tsx";
 import {
   BlobProvider,
-  PDFDownloadLink,
-  PDFViewer,
-  usePDF,
 } from "@react-pdf/renderer";
 import PdfDocument from "../../pdfExport/PdfDocument.tsx";
 import NumberInputComponent from "../../components/inputs/NumberInputComponent.tsx";
+import InfoButton from "../../components/infoButton/infoButton.tsx";
 
 const pages: PageObjects = [
   {
@@ -19,16 +22,59 @@ const pages: PageObjects = [
     items: [
       {
         render: (props) => (
-          <StringInputComponent
-            label={"Name"}
-            placeholder={"Name"}
-            id={"name"}
+          <StringSelectionComponent
+            label={"Erweiterter Modus"}
+            options={["An", "Aus"]}
+            id={"advancedMode"}
           />
         ),
       },
       {
         render: (props) => (
-          <NumberInputComponent label={"Age"} id={"age"} defaultValue={18} />
+          <div style={{ display: "flex" }}>
+            <StringInputComponent
+              label={"Name " + props.age}
+              placeholder={"Name"}
+              id={"name"}
+            />
+            <InfoButton
+              label={""}
+              dialogue={{
+                heading: "Hier ist das Info heading",
+                textValue: "Beschreibung von feature ... ",
+              }}
+            ></InfoButton>
+          </div>
+        ),
+      },
+      {
+        render: (props) => (
+          <NumberInputComponent
+            label={"Geburtsjahr"}
+            id={"birthyear"}
+            defaultValue={2000}
+          />
+        ),
+      },
+      {
+        render: (props) => (
+          <>
+            {props.advancedMode == "An" ? (
+              <>Alter: {2024 - props.birthyear!}</>
+            ) : (
+              <></>
+            )}
+          </>
+        ),
+      },
+      {
+        render: (props) => (
+          <NumberInputComponent
+            label={"Age Older"}
+            id={"age3"}
+            defaultValue={0}
+            renderCondition={(props) => props.name?.startsWith("j") ?? false}
+          />
         ),
       },
       {
@@ -71,6 +117,7 @@ const pages: PageObjects = [
 
 export type BuilderFormData = {
   name?: string;
+  var_uplift_indirect_Cost?: number;
   age?: number;
   favoriteColor?: string;
   age2?: number;
@@ -78,6 +125,8 @@ export type BuilderFormData = {
   age3?: number;
   test?: string;
   reason?: string;
+  advancedMode?: string;
+  birthyear?: number;
 };
 
 export type PageObjects = {

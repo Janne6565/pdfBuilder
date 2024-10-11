@@ -3,7 +3,7 @@ import {
   DataContext,
   ValidContext,
 } from "../../pages/mainPage/MainContentPage.tsx";
-import React, { useCallback, useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect } from "react";
 import {
   FormControl,
   InputLabel,
@@ -39,8 +39,8 @@ function StringSelectionComponent(props: StringSelectionComponentProps) {
   }, [data]);
 
   useEffect(() => {
-    setValue(props.defaultValue || "");
-  }, [props.defaultValue]);
+    setValue((data[props.id] as string) ?? (props.defaultValue || ""));
+  }, [props.defaultValue, data]);
 
   const onChange = useCallback(
     (e: SelectChangeEvent) => {
@@ -59,7 +59,7 @@ function StringSelectionComponent(props: StringSelectionComponentProps) {
             label={props.label}
             onChange={onChange}
             error={!validity[props.id]}
-            value={data[props.id] as string ?? " "}
+            value={(data[props.id] as string) ?? " "}
           >
             {props.options.map((option) => (
               <MenuItem key={option} value={option}>

@@ -55,10 +55,11 @@ function PdfDocument(props: BuilderFormData) {
             <Text>Telekom</Text>
           </View>
           <View style={styles.documentBody}>
+          { props.age != undefined ? <Text>hi</Text> : <></> }
             <Text style={styles.heading}>Telekom Rechnung</Text>
             <Text style={styles.subHeading}>Name: {props.name}</Text>
             <Text style={styles.subHeading}>Alter: {props.age}</Text>
-            <Text style={styles.subHeading}>Alter: {props.age2}</Text>
+            <Text style={styles.subHeading}>Underaged check: {props.reason}</Text>
             <Text style={styles.subHeading}>Alter: {props.name2}</Text>
             <Text style={styles.subHeading}>
               Lieblingsfarbe: {props.favoriteColor}
