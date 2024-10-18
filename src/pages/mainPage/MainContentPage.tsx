@@ -1,20 +1,14 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Toolbar,
-} from "@mui/material";
+import { Box, Button, ButtonGroup, Toolbar } from "@mui/material";
 import React, { createContext, useState } from "react";
 import StringInputComponent from "../../components/inputs/StringInputComponent.tsx";
 import DocumentHeader from "../../components/DocumentHeader.tsx";
 import styles from "./style.module.scss";
 import StringSelectionComponent from "../../components/inputs/StringSelectionComponent.tsx";
-import {
-  BlobProvider,
-} from "@react-pdf/renderer";
+import { BlobProvider } from "@react-pdf/renderer";
 import PdfDocument from "../../pdfExport/PdfDocument.tsx";
 import NumberInputComponent from "../../components/inputs/NumberInputComponent.tsx";
 import InfoButton from "../../components/infoButton/infoButton.tsx";
+import ExportButton from "../../components/exportButton/ExportButton.tsx";
 
 const pages: PageObjects = [
   {
@@ -179,8 +173,6 @@ function MainContentPage() {
             </div>
           </Box>
 
-          <BlobProvider document={<PdfDocument {...currentState} />}>
-            {({ blob, url, loading, error }) => (
               <ButtonGroup>
                 <Button
                   onClick={() => {
@@ -191,34 +183,19 @@ function MainContentPage() {
                 >
                   Back
                 </Button>
-                <Button
-                  onClick={() => {
-                    if (currentPage < pages.length - 1) {
+                {currentPage < pages.length - 1 ? (
+                  <Button
+                    onClick={() => {
                       setCurrentPage((currentPage) => currentPage + 1);
-                    } else {
-                      const blob_url = window.URL.createObjectURL(blob!);
-                      const link = document.createElement("a");
-                      link.href = blob_url ?? "";
-                      link.setAttribute("download", "export.pdf");
-                      document.body.appendChild(link);
-                      link.click();
-                      link.parentNode?.removeChild(link);
-                    }
-                  }}
-                  disabled={currentPage < pages.length - 1 ? false : loading}
-                  variant={
-                    currentPage < pages.length - 1 ? "outlined" : "contained"
-                  }
-                >
-                  {currentPage < pages.length - 1
-                    ? "Next"
-                    : loading
-                    ? "Loading..."
-                    : "Download"}
-                </Button>
+                    }}
+                    variant={"outlined"}
+                  >
+                    Next
+                  </Button>
+                ) : (
+                  <ExportButton data={currentState}/>
+                )}
               </ButtonGroup>
-            )}
-          </BlobProvider>
         </Box>
       </ValidContext.Provider>
     </DataContext.Provider>
