@@ -32,8 +32,8 @@ const ExportButton = (props: ExportButtonProps) => {
       >
         <DialogTitle id="dialog-title">Export instructions</DialogTitle>
         <DialogContent>
-          <p>Download CSV Data</p>
-          <Button onClick={() => downloadJSON(props.data, 'exported_data.json')}>Export CSV File</Button>
+          <p>Download json Data</p>
+          <Button onClick={() => downloadJSON(props.data, 'exported_data')}>Export Json File</Button>
           <p>Import file into Excel (In Progress)</p>
           <Button disabled>Open Excel Sheet</Button>
         </DialogContent>
